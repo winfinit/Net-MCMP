@@ -82,6 +82,10 @@ use constant DEFAULT_MCMP_CONFIG => {
 
 sub config {
 	my ( $self, $ref ) = @_;
+	
+	unless ( ref $ref eq 'HASH' ) {
+		die 'passed reference must be a HASH reference';
+	}
 
 	foreach my $key ( keys %{ $self->DEFAULT_MCMP_CONFIG } ) {
 		unless ( defined $ref->{$key} ) {
@@ -194,6 +198,10 @@ sub remove_app {
 sub _app {
 	my ( $self, $method, $ref ) = @_;
 
+	unless ( ref $ref eq 'HASH' ) {
+		die 'passed reference must be a HASH reference';
+	}
+	
 	foreach my $key ( keys %{ $self->DEFAULT_MCMP_CONFIG } ) {
 		unless ( defined $ref->{$key} ) {
 			$ref->{$key} = $self->DEFAULT_MCMP_CONFIG->{$key};
@@ -234,6 +242,10 @@ sub remove_route {
 sub _route {
 	my ( $self, $method, $ref ) = @_;
 
+	unless ( ref $ref eq 'HASH' ) {
+		die 'passed reference must be a HASH reference';
+	}
+	
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
 	}
@@ -244,6 +256,10 @@ sub _route {
 sub status {
 	my ( $self, $ref ) = @_;
 
+	unless ( ref $ref eq 'HASH' ) {
+		die 'passed reference must be a HASH reference';
+	}
+	
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
 	}
@@ -257,6 +273,10 @@ sub status {
 sub ping {
 	my ( $self, $ref ) = @_;
 
+	unless ( ref $ref eq 'HASH' ) {
+		die 'passed reference must be a HASH reference';
+	}
+	
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
 	}
@@ -267,9 +287,14 @@ sub ping {
 sub request {
 	my ( $self, $method, $uri, $params ) = @_;
 
+	unless ( ref $params eq 'HASH' ) {
+		die 'passed reference must be a HASH reference';
+	}
+
 	unless ( exists $self->{_ua} ) {
 		$self->{_ua} = LWP::UserAgent->new;
 	}
+	
 	my $ua   = $self->{_ua};
 	my $path = URI->new();
 	$path->query_form($params);
