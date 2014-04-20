@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Net-MCMP.t
+t/Net-MCMP-Live.t
+lib/Net/MCMP.pm
