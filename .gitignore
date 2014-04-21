@@ -2,3 +2,4 @@
 .project
 Makefile.old
 *.tar.gz
+MYMETA.*
