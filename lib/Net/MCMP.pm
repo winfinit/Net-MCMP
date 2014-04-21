@@ -310,6 +310,14 @@ sub request {
 		if ( $response->content ) {
 			my $resp_uri        = URI->new( '?' . $response->content );
 			my %parsed_response = $resp_uri->query_form;
+			
+			# fix return inconsistencies
+			foreach my $key ( keys %parsed_response ) {
+				if ( $key =~ /jvmroute/i ) {
+					$parsed_response{JvmRoute} = $parsed_response{$key};
+					delete $parsed_response{$key};
+				}
+			}
 			if ( $self->verbose ) {
 				warn "RESPONSE: " . $response->content;
 			}
@@ -571,6 +579,14 @@ Request a ping to httpd or node
 		}
 	);
 	
+	# SAMPLE $ping_response
+	#$VAR1 = {
+	#    'id' => '-540134453',
+	#    'JvmRoute' => 'MyJVMRoute',
+	#    'State' => 'OK',
+	#    'Type' => 'PING-RSP'
+	#};
+		
 =head2 $mcmp->enable_app(\%enable_app)
 
 Sends request to enable newly configured Node

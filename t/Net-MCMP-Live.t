@@ -2,12 +2,12 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Test::More tests => 27;
+use Test::More tests => 37;
 
 use_ok( 'Net::MCMP', 'use mcmp' );
 
 my $mcmp_uri = 'http://127.0.0.1:6666';
-my $mcmp = Net::MCMP->new( { uri => $mcmp_uri } );
+my $mcmp = Net::MCMP->new( { uri => $mcmp_uri, debug => 0 } );
 
 is( ref $mcmp,  'Net::MCMP',    'making sure object created' );
 is( $mcmp->uri, $mcmp_uri, 'making sure URI is returned correctly' );
@@ -39,6 +39,10 @@ ok(
 	'ping command'
 );
 
+is( $ping_resp->{'State'}, 'OK', 'status State response');
+is( $ping_resp->{'JvmRoute'}, 'MyJVMRoute', 'status JVMRoute response');
+is( $ping_resp->{'Type'}, 'PING-RSP', 'ping Type response');
+ok( $ping_resp->{'id'}, 'status id response');
 
 ok( !$mcmp->has_error, 'no errors' );
 
@@ -74,7 +78,7 @@ ok(
 #        };
 
 is( $status_resp->{'State'}, 'OK', 'status State response');
-is( $status_resp->{'JVMRoute'}, 'MyJVMRoute', 'status JVMRoute response');
+is( $status_resp->{'JvmRoute'}, 'MyJVMRoute', 'status JVMRoute response');
 is( $status_resp->{'Type'}, 'STATUS-RSP', 'status Type response');
 ok( $status_resp->{'id'}, 'status id response');
 
@@ -96,7 +100,7 @@ ok(
 ok( !$mcmp->has_error, 'no errors' );
 
 ok(
-	$mcmp->stop_app(
+	my $stop_resp = $mcmp->stop_app(
 		{
 			JvmRoute => 'MyJVMRoute',
 			Alias    => 'SomeHost',
@@ -105,6 +109,22 @@ ok(
 	),
 	'stop context'
 );
+
+
+#$VAR1 = {
+#          'Type' => 'STOP-APP-RSP',
+#          'Context' => '/cluster',
+#          'JvmRoute' => 'MyJVMRoute',
+#          'Requests' => '0',
+#          'Alias' => 'SomeHost'
+#        };
+# Type=STOP-APP-RSP&JvmRoute=MyJVMRoute&Alias=SomeHost&Context=/cluster&Requests=0
+is( $stop_resp->{'Type'}, 'STOP-APP-RSP', 'stop-app Type response');
+is( $stop_resp->{'Alias'}, 'SomeHost', 'stop-app alias response');
+is( $stop_resp->{'Context'}, '/cluster', 'stop-app context response');
+like( $stop_resp->{'Requests'}, qr/\d+/, 'stop-app requests response');
+
+
 
 ok( !$mcmp->has_error, 'no errors' );
 

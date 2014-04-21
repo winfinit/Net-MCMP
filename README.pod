@@ -219,6 +219,14 @@ Request a ping to httpd or node
 		}
 	);
 	
+	# SAMPLE $ping_response
+	#$VAR1 = {
+	#    'id' => '-540134453',
+	#    'JvmRoute' => 'MyJVMRoute',
+	#    'State' => 'OK',
+	#    'Type' => 'PING-RSP'
+	#};
+		
 =head2 $mcmp->enable_app(\%enable_app)
 
 Sends request to enable newly configured Node
