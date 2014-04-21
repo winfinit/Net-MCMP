@@ -613,7 +613,7 @@ Sends load metrics for configured node, number from 1-100
 	# SAMPLE $status_response
 	# $VAR1 = {
 	#     'State' => 'OK',
-	#     'JVMRoute' => 'MyJVMRoute',
+	#     'JvmRoute' => 'MyJVMRoute',
 	#     'id' => '-297586570',
 	#     'Type' => 'STATUS-RSP'
 	# };
