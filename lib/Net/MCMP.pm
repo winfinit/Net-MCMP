@@ -6,7 +6,7 @@ use warnings;
 use HTTP::Request;
 use LWP::UserAgent;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
 	my ( $class, $ref ) = @_;
@@ -14,6 +14,8 @@ sub new {
 	unless ( exists $ref->{uri} ) {
 		die 'missing uri';
 	}
+
+	$ref->{uri} =~ s/\s//g;
 
 	my $self = { _uri => $ref->{uri} };
 

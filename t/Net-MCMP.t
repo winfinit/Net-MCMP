@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 41;
+use Test::More;
 
 use_ok( 'Net::MCMP', 'use mcmp' );
 
@@ -63,13 +63,13 @@ SKIP: {
 		),
 		'enable context'
 	);
+	ok( !$mcmp->has_error, 'no errors' );
 
 	ok( $mcmp->dump,       'response from dump command' );
 	ok( !$mcmp->has_error, 'no errors' );
 	ok( $mcmp->info,       'response from info command' );
 	ok( !$mcmp->has_error, 'no errors' );
 
-	ok( !$mcmp->has_error, 'no errors' );
 
 	ok(
 		my $status_resp = $mcmp->status(
@@ -194,3 +194,5 @@ SKIP: {
 	ok( !$mcmp->has_error, 'no errors' );
 
 }
+
+done_testing();
