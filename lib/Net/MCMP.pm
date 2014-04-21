@@ -482,6 +482,8 @@ Official documentation of MCMP can be found here: https://community.jboss.org/wi
 Creates a new MCMP object, and returns a I<Net::MCMP> object 
 representing that connection.
 
+	my $mcmp = Net::MCMP({ uri => 'http://127.0.0.1:6666', debug => 0});
+
 I<%args> can contain:
 
 =over 4
