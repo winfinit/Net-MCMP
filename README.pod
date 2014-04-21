@@ -334,7 +334,18 @@ Sends request to remove registered node
 			JvmRoute => 'MyAppNode1',
 		}
 	);
-					
+	
+=head2 $mcmp->debug()
+
+Sends request to receive unparsed DEBUG content of mod_cluster
+
+	my $debug_response = $mcmp->debug();
+
+=head2 $mcmp->info()
+
+Sends request to receive unparsed INFO content of mod_cluster
+
+	my $info_response = $mcmp->info();
 
 =head1 SUPPORT
 

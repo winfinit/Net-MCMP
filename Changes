@@ -3,4 +3,5 @@ Revision history for Perl extension Net::MCMP.
 0.01  Sun Apr 20 16:35:02 2014
 	- original version; created by h2xs 1.23 with options
 		-AX Net::MCMP
-
+0.02  Sun Apr 21 13:43:02 2014
+	- added INFO and DUMP commands

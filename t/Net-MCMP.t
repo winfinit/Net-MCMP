@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
-use Test::More tests => 38;
+use Test::More tests => 41;
 
 use_ok( 'Net::MCMP', 'use mcmp' );
 
@@ -13,10 +12,11 @@ is( ref $mcmp,  'Net::MCMP', 'making sure object created' );
 is( $mcmp->uri, $mcmp_uri,   'making sure URI is returned correctly' );
 
 SKIP: {
-	skip "live tests, MCMP_LIVE environment variable is not set", 35
+	skip "live tests, MCMP_LIVE environment variable is not set", 39
 	  unless $ENV{MCMP_LIVE_TESTS};
-	  
-	print "using MCMP URI: $mcmp_uri to override, set nvironment variable MCMP_TEST_URI\n";
+
+	print
+"using MCMP URI: $mcmp_uri to override, set nvironment variable MCMP_TEST_URI\n";
 
 	ok(
 		$mcmp->config(
@@ -63,6 +63,11 @@ SKIP: {
 		),
 		'enable context'
 	);
+
+	ok( $mcmp->dump,       'response from dump command' );
+	ok( !$mcmp->has_error, 'no errors' );
+	ok( $mcmp->info,       'response from info command' );
+	ok( !$mcmp->has_error, 'no errors' );
 
 	ok( !$mcmp->has_error, 'no errors' );
 

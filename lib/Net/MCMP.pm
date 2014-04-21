@@ -16,8 +16,8 @@ sub new {
 	}
 
 	my $self = { _uri => $ref->{uri} };
-	
-	if ( exists $ref->{debug} ) {
+
+	if ( exists $ref->{debug} && $ref->{debug} ) {
 		$self->{_debug} = 1;
 	}
 
@@ -29,8 +29,8 @@ sub uri {
 	return $_[0]->{_uri};
 }
 
-sub verbose {
-	return $_[0]->{_debug} || $ENV{MCMP_TRACE}  || undef;
+sub debug {
+	return ($_[0]->{_debug} || $ENV{MCMP_TRACE} || undef);
 }
 
 use constant DEFAULT_MCMP_CONFIG => {
@@ -82,7 +82,7 @@ use constant DEFAULT_MCMP_CONFIG => {
 
 sub config {
 	my ( $self, $ref ) = @_;
-	
+
 	unless ( ref $ref eq 'HASH' ) {
 		die 'passed reference must be a HASH reference';
 	}
@@ -201,7 +201,7 @@ sub _app {
 	unless ( ref $ref eq 'HASH' ) {
 		die 'passed reference must be a HASH reference';
 	}
-	
+
 	foreach my $key ( keys %{ $self->DEFAULT_MCMP_CONFIG } ) {
 		unless ( defined $ref->{$key} ) {
 			$ref->{$key} = $self->DEFAULT_MCMP_CONFIG->{$key};
@@ -245,7 +245,7 @@ sub _route {
 	unless ( ref $ref eq 'HASH' ) {
 		die 'passed reference must be a HASH reference';
 	}
-	
+
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
 	}
@@ -259,7 +259,7 @@ sub status {
 	unless ( ref $ref eq 'HASH' ) {
 		die 'passed reference must be a HASH reference';
 	}
-	
+
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
 	}
@@ -276,7 +276,7 @@ sub ping {
 	unless ( ref $ref eq 'HASH' ) {
 		die 'passed reference must be a HASH reference';
 	}
-	
+
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
 	}
@@ -284,44 +284,77 @@ sub ping {
 	return $self->request( 'PING', $self->uri, $ref );
 }
 
+sub dump {
+	my ($self) = @_;
+
+	return $self->request( 'DUMP', $self->uri );
+}
+
+sub info {
+	my ($self) = @_;
+
+	return $self->request( 'INFO', $self->uri );
+}
+
 sub request {
 	my ( $self, $method, $uri, $params ) = @_;
-
-	unless ( ref $params eq 'HASH' ) {
-		die 'passed reference must be a HASH reference';
-	}
 
 	unless ( exists $self->{_ua} ) {
 		$self->{_ua} = LWP::UserAgent->new;
 	}
-	
+
 	my $ua   = $self->{_ua};
 	my $path = URI->new();
-	$path->query_form($params);
-	my $req = HTTP::Request->new( $method, $uri, undef, $path->query );
-
-	if ( $self->verbose ) {
-		warn "Making a $method request to $uri with these params: "
-		  . $path->query;
+	if ( defined $params ) {
+		$path->query_form($params);
 	}
+
+	if ( $self->debug ) {
+		if ( $path->query ) {
+			warn "Making a $method request to $uri with these params: "
+			  . $path->query;
+		}
+		else {
+			warn "Making a $method request to $uri";
+		}
+
+	}
+	my $req = HTTP::Request->new( $method, $uri, undef, $path->query || undef );
+	$req->header( 'Accept' => 'text/plain' );
 	my $response = $ua->request($req);
 
 	if ( $response->is_success ) {
 		if ( $response->content ) {
-			my $resp_uri        = URI->new( '?' . $response->content );
-			my %parsed_response = $resp_uri->query_form;
-			
-			# fix return inconsistencies
-			foreach my $key ( keys %parsed_response ) {
-				if ( $key =~ /jvmroute/i ) {
-					$parsed_response{JvmRoute} = $parsed_response{$key};
-					delete $parsed_response{$key};
-				}
-			}
-			if ( $self->verbose ) {
+
+			if ( $self->debug ) {
 				warn "RESPONSE: " . $response->content;
 			}
-			return \%parsed_response;
+
+			if ( $method eq 'DUMP' ) {
+
+				# dump parser
+				return $response->content;
+			}
+			elsif ( $method eq 'INFO' ) {
+
+				# info parser
+				return $response->content;
+			}
+			else {
+				my $resp_uri        = URI->new( '?' . $response->content );
+				my %parsed_response = $resp_uri->query_form;
+
+				# fix return inconsistencies
+				foreach my $key ( keys %parsed_response ) {
+					if ( $key =~ /jvmroute/i ) {
+						$parsed_response{JvmRoute} = $parsed_response{$key};
+						delete $parsed_response{$key};
+					}
+				}
+
+				return \%parsed_response;
+
+			}
 		}
 		else {
 			return 1;
@@ -329,9 +362,15 @@ sub request {
 	}
 	else {
 		$self->error( $response->header('mess') );
-		if ( $self->verbose ) {
-			warn "CURL for debugging: curl -X $method '$uri' -d '"
-			  . $path->query . "'";
+		if ( $self->debug ) {
+			if ( $path->query ) {
+				warn "CURL for debugging: curl -X $method '$uri' -d '"
+				  . $path->query . "'";
+			}
+			else {
+				warn "CURL for debugging: curl -X $method '$uri'";
+			}
+
 		}
 		return undef;
 	}
@@ -344,7 +383,7 @@ sub has_error {
 sub error {
 	my ( $self, $error ) = @_;
 	if ($error) {
-		if ( $self->verbose ) {
+		if ( $self->debug ) {
 			warn "FAILURE: $error";
 		}
 		$self->{_error} = $error;
@@ -694,7 +733,18 @@ Sends request to remove registered node
 			JvmRoute => 'MyAppNode1',
 		}
 	);
-					
+	
+=head2 $mcmp->debug()
+
+Sends request to receive unparsed DEBUG content of mod_cluster
+
+	my $debug_response = $mcmp->debug();
+
+=head2 $mcmp->info()
+
+Sends request to receive unparsed INFO content of mod_cluster
+
+	my $info_response = $mcmp->info();
 
 =head1 SUPPORT
 
