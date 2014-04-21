@@ -1,4 +1,4 @@
-Net-MCMP version 0.01
+Net-MCMP version 0.04
 =====================
 
 The README is used to introduce the module and provide instructions on
@@ -34,7 +34,7 @@ Put the correct copyright and licence information here.
 Copyright (C) 2014 by Roman Jurkov
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.18.1 or,
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 

@@ -6,7 +6,7 @@ use warnings;
 use HTTP::Request;
 use LWP::UserAgent;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my ( $class, $ref ) = @_;
@@ -760,7 +760,7 @@ https://github.com/winfinit/Net-MCMP
 
 =head1 AUTHOR
 
-Roman Jurkov (winfinit) E<lt>winfinit@gmail.comE<gt>
+Roman Jurkov (winfinit) E<lt>winfinit@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
