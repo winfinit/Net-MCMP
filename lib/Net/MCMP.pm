@@ -6,7 +6,7 @@ use warnings;
 use HTTP::Request;
 use LWP::UserAgent;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
 	my ( $class, $ref ) = @_;
@@ -15,7 +15,7 @@ sub new {
 		die 'missing uri';
 	}
 
-	$ref->{uri} =~ s/\s//g;
+	$ref->{uri} =~ s/\s+//g;
 
 	my $self = { _uri => $ref->{uri} };
 
@@ -308,6 +308,11 @@ sub request {
 	my $ua   = $self->{_ua};
 	my $path = URI->new();
 	if ( defined $params ) {
+		foreach my $key ( qw/Context Alias/ ) {
+			next unless defined $params->{$key};
+			$params->{$key} =~ s/\s+//g;
+		}
+		
 		$path->query_form($params);
 	}
 
@@ -467,12 +472,10 @@ Net::MCMP - Mod Cluster Management Protocol client
 
 I<Net::MCMP> is an implementation of the Mod Cluster
 Management Protocol (MCMP). I<Net::MCMP> uses I<LWP::UserAgent> and I<HTTP::Request> for its
-communication with mod_cluster. It provides a subset of the commands listed in
-the MCMP documentation, which can be found
-at I<https://community.jboss.org/docs/DOC-11425>.
+communication with mod_cluster. 
 
 MCMP stands for Mod Cluster Management Protocol and is a method of
-adding mod_proxy settings dynamically, as appose to
+adding proxy settings dynamically, as appose to
 creating static apache rules. 
 
 Official documentation of MCMP can be found here: https://community.jboss.org/wiki/Mod-ClusterManagementProtocol
@@ -750,9 +753,21 @@ Sends request to receive unparsed INFO content of mod_cluster
 
 	my $info_response = $mcmp->info();
 
+=head2 $mcmp->has_errors()
+
+Checks if a remote call returned any errors
+
+	my $has_errors = $mcmp->has_errors();
+
+=head2 $mcmp->error()
+
+Error string that was returned from mod_cluster handler.
+
+	my $error_string = $mcmp->error();
+		
 =head1 SUPPORT
 
-For samples/tutorials, take a look at provided tests in F<eg/> in
+For samples/tutorials, take a look at provided tests in F<t/> in
 the distribution directory.
 
 Please report all bugs via github at
