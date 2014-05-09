@@ -9,3 +9,6 @@ Revision history for Perl extension Net::MCMP.
 	- fixed tests quantity
 0.04  Sun Apr 21 15:30:00 2014
 	- updated minimum perl version to 5.6
+0.05  Mon Apr 22 00:31:12 2014
+	- documented error and has_errors method
+	- 

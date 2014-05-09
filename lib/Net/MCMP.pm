@@ -6,7 +6,7 @@ use warnings;
 use HTTP::Request;
 use LWP::UserAgent;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 sub new {
 	my ( $class, $ref ) = @_;
@@ -97,6 +97,10 @@ sub config {
 
 	unless ( $ref->{JvmRoute} ) {
 		die 'JvmRoute is missing';
+	}
+	
+	if ( length $ref->{JvmRoute} > 80 ) {
+		die 'JvmRoute cannot exceed 80 characters';
 	}
 
 	if ( length $ref->{Balancer} > 40 ) {
@@ -204,9 +208,9 @@ sub _app {
 		die 'passed reference must be a HASH reference';
 	}
 
-	foreach my $key ( keys %{ $self->DEFAULT_MCMP_CONFIG } ) {
+	foreach my $key ( keys %{ $self->DEFAULT_MCMP_APP } ) {
 		unless ( defined $ref->{$key} ) {
-			$ref->{$key} = $self->DEFAULT_MCMP_CONFIG->{$key};
+			$ref->{$key} = $self->DEFAULT_MCMP_APP->{$key};
 		}
 	}
 
@@ -535,7 +539,7 @@ Name of the node.
 
 =item * Alias (required)
 
-Virtual host entry in https for the node
+List the virtual hosts. ex. localhost,localhost2.
 
 =item * Host (optional)
 
@@ -611,7 +615,7 @@ Max time httpd will wait for the backend connection. (Defaults to 0, no timeout)
 
 =item * Context (optional)
 
-List the context the virtual host list supports like /myapp,/ourapp.
+List of the contexts that node supports. ex. /myapp,/ourapp.
 
 =back
 

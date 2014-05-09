@@ -16,7 +16,7 @@
 #     BUILD_REQUIRES => {  }
 #     CONFIGURE_REQUIRES => {  }
 #     NAME => q[Net::MCMP]
-#     PREREQ_PM => {  }
+#     PREREQ_PM => { LWP::UserAgent=>q[0], HTTP::Request=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/Net/MCMP.pm]
 
@@ -57,11 +57,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Net::MCMP
 NAME_SYM = Net_MCMP
-VERSION = 0.04
+VERSION = 0.07
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_04
+VERSION_SYM = 0_07
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.04
+XS_VERSION = 0.07
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -187,10 +187,10 @@ PERL_ARCHIVE_AFTER =
 TO_INST_PM = README.pod \
 	lib/Net/MCMP.pm
 
-PM_TO_BLIB = lib/Net/MCMP.pm \
-	blib/lib/Net/MCMP.pm \
-	README.pod \
-	$(INST_LIB)/Net/README.pod
+PM_TO_BLIB = README.pod \
+	$(INST_LIB)/Net/README.pod \
+	lib/Net/MCMP.pm \
+	blib/lib/Net/MCMP.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -259,7 +259,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Net-MCMP
-DISTVNAME = Net-MCMP-0.04
+DISTVNAME = Net-MCMP-0.07
 
 
 # --- MakeMaker macro section:
@@ -443,22 +443,22 @@ clean_subdirs :
 
 clean :: clean_subdirs
 	- $(RM_F) \
-	  $(MAKE_APERL_FILE) perl.exe \
-	  perl$(EXE_EXT) pm_to_blib \
-	  $(BASEEXT).x $(BASEEXT).def \
-	  lib$(BASEEXT).def blibdirs.ts \
-	  *$(LIB_EXT) core.[0-9][0-9] \
-	  core core.[0-9] \
-	  pm_to_blib.ts $(BASEEXT).bso \
-	  *$(OBJ_EXT) $(INST_ARCHAUTODIR)/extralibs.all \
-	  tmon.out $(INST_ARCHAUTODIR)/extralibs.ld \
-	  core.*perl.*.? perl \
-	  *perl.core perlmain.c \
-	  $(BASEEXT).exp so_locations \
-	  core.[0-9][0-9][0-9] $(BOOTSTRAP) \
-	  MYMETA.json mon.out \
-	  core.[0-9][0-9][0-9][0-9] core.[0-9][0-9][0-9][0-9][0-9] \
-	  MYMETA.yml 
+	  $(BOOTSTRAP) pm_to_blib.ts \
+	  perl.exe $(BASEEXT).bso \
+	  core.[0-9][0-9] *perl.core \
+	  $(INST_ARCHAUTODIR)/extralibs.ld *$(LIB_EXT) \
+	  $(BASEEXT).def perlmain.c \
+	  $(MAKE_APERL_FILE) so_locations \
+	  $(BASEEXT).exp perl \
+	  core.[0-9] MYMETA.json \
+	  mon.out *$(OBJ_EXT) \
+	  pm_to_blib $(BASEEXT).x \
+	  perl$(EXE_EXT) blibdirs.ts \
+	  $(INST_ARCHAUTODIR)/extralibs.all MYMETA.yml \
+	  tmon.out core.[0-9][0-9][0-9] \
+	  core.[0-9][0-9][0-9][0-9][0-9] core.[0-9][0-9][0-9][0-9] \
+	  core.*perl.*.? core \
+	  lib$(BASEEXT).def 
 	- $(RM_RF) \
 	  blib 
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
@@ -473,7 +473,7 @@ realclean_subdirs :
 # Delete temporary files (via clean) and also delete dist files
 realclean purge ::  clean realclean_subdirs
 	- $(RM_F) \
-	  $(FIRST_MAKEFILE) $(MAKEFILE_OLD) 
+	  $(MAKEFILE_OLD) $(FIRST_MAKEFILE) 
 	- $(RM_RF) \
 	  $(DISTVNAME) 
 
@@ -500,8 +500,10 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  directory:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
-	$(NOECHO) $(ECHO) 'requires: {}' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: 0.04' >> META_new.yml
+	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  HTTP::Request: 0' >> META_new.yml
+	$(NOECHO) $(ECHO) '  LWP::UserAgent: 0' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: 0.07' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -537,11 +539,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '         "requires" : {}' >> META_new.json
+	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '            "HTTP::Request" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "LWP::UserAgent" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.04"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.07"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -841,6 +846,8 @@ ppd :
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Mod Cluster Management Protocol client</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Roman Jurkov &lt;winfinit@cpan.org&gt;</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="HTTP::Request" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="LWP::UserAgent" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-2level-5.18" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
@@ -851,8 +858,8 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  lib/Net/MCMP.pm blib/lib/Net/MCMP.pm \
-	  README.pod $(INST_LIB)/Net/README.pod 
+	  README.pod $(INST_LIB)/Net/README.pod \
+	  lib/Net/MCMP.pm blib/lib/Net/MCMP.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
