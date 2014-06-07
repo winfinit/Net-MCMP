@@ -57,11 +57,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Net::MCMP
 NAME_SYM = Net_MCMP
-VERSION = 0.07
+VERSION = 0.08
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_07
+VERSION_SYM = 0_08
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.07
+XS_VERSION = 0.08
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -187,10 +187,10 @@ PERL_ARCHIVE_AFTER =
 TO_INST_PM = README.pod \
 	lib/Net/MCMP.pm
 
-PM_TO_BLIB = README.pod \
-	$(INST_LIB)/Net/README.pod \
-	lib/Net/MCMP.pm \
-	blib/lib/Net/MCMP.pm
+PM_TO_BLIB = lib/Net/MCMP.pm \
+	blib/lib/Net/MCMP.pm \
+	README.pod \
+	$(INST_LIB)/Net/README.pod
 
 
 # --- MakeMaker platform_constants section:
@@ -259,7 +259,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Net-MCMP
-DISTVNAME = Net-MCMP-0.07
+DISTVNAME = Net-MCMP-0.08
 
 
 # --- MakeMaker macro section:
@@ -443,22 +443,22 @@ clean_subdirs :
 
 clean :: clean_subdirs
 	- $(RM_F) \
-	  $(BOOTSTRAP) pm_to_blib.ts \
-	  perl.exe $(BASEEXT).bso \
-	  core.[0-9][0-9] *perl.core \
-	  $(INST_ARCHAUTODIR)/extralibs.ld *$(LIB_EXT) \
+	  core lib$(BASEEXT).def \
+	  $(MAKE_APERL_FILE) MYMETA.yml \
+	  core.[0-9][0-9][0-9] mon.out \
+	  perl$(EXE_EXT) core.[0-9] \
+	  $(BASEEXT).bso core.[0-9][0-9] \
 	  $(BASEEXT).def perlmain.c \
-	  $(MAKE_APERL_FILE) so_locations \
-	  $(BASEEXT).exp perl \
-	  core.[0-9] MYMETA.json \
-	  mon.out *$(OBJ_EXT) \
-	  pm_to_blib $(BASEEXT).x \
-	  perl$(EXE_EXT) blibdirs.ts \
-	  $(INST_ARCHAUTODIR)/extralibs.all MYMETA.yml \
-	  tmon.out core.[0-9][0-9][0-9] \
-	  core.[0-9][0-9][0-9][0-9][0-9] core.[0-9][0-9][0-9][0-9] \
-	  core.*perl.*.? core \
-	  lib$(BASEEXT).def 
+	  $(BASEEXT).exp *perl.core \
+	  $(BASEEXT).x so_locations \
+	  MYMETA.json *$(OBJ_EXT) \
+	  $(BOOTSTRAP) $(INST_ARCHAUTODIR)/extralibs.all \
+	  core.*perl.*.? pm_to_blib.ts \
+	  tmon.out blibdirs.ts \
+	  *$(LIB_EXT) pm_to_blib \
+	  core.[0-9][0-9][0-9][0-9][0-9] $(INST_ARCHAUTODIR)/extralibs.ld \
+	  perl core.[0-9][0-9][0-9][0-9] \
+	  perl.exe 
 	- $(RM_RF) \
 	  blib 
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
@@ -503,7 +503,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  HTTP::Request: 0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  LWP::UserAgent: 0' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: 0.07' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: 0.08' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -546,7 +546,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.07"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.08"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -858,8 +858,8 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  README.pod $(INST_LIB)/Net/README.pod \
-	  lib/Net/MCMP.pm blib/lib/Net/MCMP.pm 
+	  lib/Net/MCMP.pm blib/lib/Net/MCMP.pm \
+	  README.pod $(INST_LIB)/Net/README.pod 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

@@ -11,4 +11,7 @@ Revision history for Perl extension Net::MCMP.
 	- updated minimum perl version to 5.6
 0.05  Mon Apr 22 00:31:12 2014
 	- documented error and has_errors method
-	- 
+0.07 Tue Apr 27 00:00:00 2014
+	- updated call to have content-type 
+0.08 Tue Jun 07 00:00:00 2014
+	- removed duplicate validation 

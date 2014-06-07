@@ -6,7 +6,7 @@ use warnings;
 use HTTP::Request;
 use LWP::UserAgent;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
 	my ( $class, $ref ) = @_;
@@ -133,10 +133,6 @@ sub config {
 
 	if ( $ref->{MaxAttempts} < 1 ) {
 		die 'MaxAttempts cannot be less than 1';
-	}
-
-	if ( length $ref->{JvmRoute} > 80 ) {
-		die 'JvmRoute cannot exceed 80 characters';
 	}
 
 	if ( length $ref->{Domain} > 20 ) {
@@ -332,6 +328,7 @@ sub request {
 	}
 	my $req = HTTP::Request->new( $method, $uri, undef, $path->query || undef );
 	$req->header( 'Accept' => 'text/plain' );
+	$req->header( 'Content-Type' => 'application/x-www-form-urlencoded' );
 	my $response = $ua->request($req);
 
 	if ( $response->is_success ) {
